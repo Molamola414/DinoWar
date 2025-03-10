@@ -67,9 +67,8 @@ public class NinjaDinoAI : FigherDinoAI
             }
         }
 
-        hitAccum--;
-        if(hitAccum <= 0) {
-            this.SwitchWeapon();
+        if(--hitAccum <= 0) {
+            SwitchWeapon();
             hitAccum = Random.Range(5, 15);
         }
     }
@@ -99,12 +98,9 @@ public class NinjaDinoAI : FigherDinoAI
     private void SwitchWeapon() {
         _creature.SwitchActiveWeapon();
         this.SetDisguiseMode(false);
-
-        // if(_creature.GetActiveWeapon().attackType == Weapon.AttackType.Ranged) {
-
     }
 
-    protected override void MeleeMove(Vector3 direction, bool canAttack)
+    protected override void HandleMeleeCombat(Vector3 direction, bool canAttack)
     {
         skillTimeCount += Time.deltaTime;
         if(isDisguiseMode == false && skillTimeCount >= skillInterval) {
@@ -115,11 +111,11 @@ public class NinjaDinoAI : FigherDinoAI
             }
         }
         else {
-            base.MeleeMove(direction, canAttack);
+            base.HandleMeleeCombat(direction, canAttack);
         }
     }
 
-    protected override void RangedMove(Vector3 direction, bool canAttack, bool canSeeEnemy)
+    protected override void HandleRangedCombat(Vector3 direction, bool canAttack)
     {
         skillTimeCount += Time.deltaTime;
         if(skillTimeCount >= skillInterval) {
@@ -145,7 +141,7 @@ public class NinjaDinoAI : FigherDinoAI
 
         }
         else {
-            base.RangedMove(direction, canAttack, canSeeEnemy);
+            base.HandleRangedCombat(direction, canAttack);
         }
     }
 
@@ -175,26 +171,14 @@ public class NinjaDinoAI : FigherDinoAI
         if(isDisguiseMode == isDisguise) return;
         
         isDisguiseMode = isDisguise;
+        _creature.speed = isDisguiseMode ? disguiseSpeed : originalSpeed;
 
-        if(isDisguiseMode) {
-            _creature.speed = disguiseSpeed;
-
-            for(int i=0; i<accessoryList.Length; i++) {
-                accessoryList[i].SetActive(false);
-            }
-            for(int i=0; i<dinoMeshes.Length; i++) {
-                dinoMeshes[i].material = ninjaModeMaterial;
-            }
+        foreach(var accessory in accessoryList) {
+            accessory.SetActive(!isDisguiseMode);
         }
-        else {
-            _creature.speed = originalSpeed;
-            
-            for(int i=0; i<accessoryList.Length; i++) {
-                accessoryList[i].SetActive(true);
-            }
-            for(int i=0; i<dinoMeshes.Length; i++) {
-                dinoMeshes[i].material = normalModeMaterial;
-            }
+
+        foreach(var mesh in dinoMeshes) {
+            mesh.material = isDisguiseMode ? ninjaModeMaterial : normalModeMaterial;
         }
     }
 

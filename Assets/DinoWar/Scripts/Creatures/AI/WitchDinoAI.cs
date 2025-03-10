@@ -36,7 +36,7 @@ public class WitchDinoAI : FigherDinoAI
         base.OnAttackEnd(animEvent);
     }
 
-    protected override void RangedMove(Vector3 direction, bool canAttack, bool canSeeEnemy)
+    protected override void HandleRangedCombat(Vector3 direction, bool canAttack)
     {
         skillTimeCount += Time.deltaTime;
         if(skillTimeCount >= skillInterval) {
@@ -61,7 +61,7 @@ public class WitchDinoAI : FigherDinoAI
             }
         }
         else {
-            base.RangedMove(direction, canAttack, canSeeEnemy);
+            base.HandleRangedCombat(direction, canAttack);
         }
     }
 

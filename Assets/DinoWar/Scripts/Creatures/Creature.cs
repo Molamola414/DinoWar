@@ -66,7 +66,7 @@ public class Creature : MonoBehaviour
     private GameObject hitVFXPrefab;
 
     private Vector3 _direction = Vector3.zero;
-    private const int Gravity = 120;//320;
+    private static readonly int Gravity = 120;//320;
 
     private float impactMass = 3;
     private Vector3 impactForce = Vector3.zero;
@@ -113,16 +113,16 @@ public class Creature : MonoBehaviour
             Attack();
 
             if(impactForce != Vector3.zero) {
-                if(impactForce.magnitude > 0.2f) {
-                    // this.controls.Direction = Vector2.zero;
+                if(impactForce.sqrMagnitude > 0.04f) {
                     Vector3 dir = impactForce * Time.deltaTime;
                     dir.y -= Gravity * Time.deltaTime;
                     charController.Move(dir);
+
+                    impactForce = Vector3.Lerp(impactForce, Vector3.zero, 5 * Time.deltaTime);
                 }
                 if(impactForce.magnitude < 1f) {
                     Move();
                 }
-                impactForce = Vector3.Lerp(impactForce, Vector3.zero, 5*Time.deltaTime);
             }
             else {
                 Move();
@@ -156,13 +156,16 @@ public class Creature : MonoBehaviour
     }
 
     public Weapon SwitchActiveWeapon() {
+        if(weaponList.Count == 0) return null;
+
         int nextIdx = (activeWeaponIndex+1)%weaponList.Count;
         return SetActiveWeapon(nextIdx);
     }
 
     public Weapon SetActiveWeapon(int idx) {
-        weaponList[activeWeaponIndex].gameObject.SetActive(false);
+        if (weaponList.Count == 0 || idx >= weaponList.Count) return null;
 
+        weaponList[activeWeaponIndex].gameObject.SetActive(false);
         activeWeaponIndex = idx;
         weaponList[activeWeaponIndex].gameObject.SetActive(true);
 
@@ -182,29 +185,35 @@ public class Creature : MonoBehaviour
     /// <param name="damage">Damage value</param>
     public virtual void GetDamage(float damage, BulletShell.BulletHitEffectType hitType = BulletShell.BulletHitEffectType.Default)
     {
-        // TO-FIX: Multiple damage may cause damage & die messing together
+        if(currentHp <= 0)
+            return;
+
         currentHp -= damage;
 
         switch(hitType) {
             case BulletShell.BulletHitEffectType.Default:
             {
                 GameObject hitVFX = ObjectPoolManager.CreatePooled(hitVFXPrefab, this.transform);
-                Vector3 randomVec = Random.insideUnitSphere;
-                hitVFX.transform.position = new Vector3(this.transform.position.x + randomVec.x * 3f, this.transform.position.y + 5f + randomVec.y * 2f, this.transform.position.z + randomVec.z * 3f);
+                hitVFX.transform.position = this.transform.position + Random.insideUnitSphere * 2f + Vector3.up * 5f;
             }
             break;
         }
 
         if (currentHp <= 0)
         {
-            animator.SetBool("IsDead", true);
-            animator.SetTrigger("DieOnBack");
-            AudioPlayer.PlayEffect("Death");
+            Die();
         }
         else
         {
             animator.SetTrigger("Damage");
         }
+    }
+
+    private void Die()
+    {
+        animator.SetBool("IsDead", true);
+        animator.SetTrigger("DieOnBack");
+        AudioPlayer.PlayEffect("Death");
     }
 
     /// <summary>

@@ -7,21 +7,31 @@ public class PlayerMarker : MonoBehaviour
     public Transform trackingTarget;
     public Color markerColor;
 
-    SpriteRenderer ringRenderer;
-    int layerMask;
+    private SpriteRenderer ringRenderer;
+    private int layerMask;
+    private static readonly float raycastDistance = 1000f;
+
+    void Awake()
+    {
+        ringRenderer = GetComponentInChildren<SpriteRenderer>();
+        if(ringRenderer != null)
+        {
+            ringRenderer.color = markerColor;   
+        }
+        else {
+            Debug.LogWarning("PlayerMarker: No SpriteRenderer found in children!", this);
+        }
+    }
 
     void Start()
     {
-        ringRenderer = this.GetComponentInChildren<SpriteRenderer>();
-        ringRenderer.color = markerColor;   
         layerMask = LayerMask.GetMask("Environment");
     }
 
     void Update()
     {
         if(trackingTarget != null && trackingTarget.gameObject.activeSelf) {
-            RaycastHit hit;
-            if(Physics.Raycast(trackingTarget.position, Vector3.down, out hit, 1000, layerMask)) {
+            if(Physics.Raycast(trackingTarget.position, Vector3.down, out RaycastHit hit, raycastDistance, layerMask)) {
                 transform.position = hit.point;
             }
             else {
@@ -29,7 +39,12 @@ public class PlayerMarker : MonoBehaviour
             }
         }
         else {
-            Destroy(gameObject);
+            SelfDestruct();
         }
+    }
+
+    private void SelfDestruct()
+    {
+        Destroy(gameObject, 0.5f);
     }
 }

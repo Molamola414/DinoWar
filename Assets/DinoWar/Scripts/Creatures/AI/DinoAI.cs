@@ -45,16 +45,27 @@ public class DinoAI : MonoBehaviour
 
     public virtual void OnEnable()
     {
-        transform.localScale = new Vector3(defaultScale.x*1.2f, defaultScale.y/10f, defaultScale.z*1.2f);
+        if (transform.localScale != defaultScale) {
+            transform.localScale = new Vector3(defaultScale.x*1.2f, defaultScale.y/10f, defaultScale.z*1.2f);
+        }
 
         walkSpeedRatio = 0;
 
-        Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOScale(defaultScale, 0.6f).SetEase(Ease.OutElastic));
-        seq.AppendCallback(()=> {
-            walkSpeedRatio = 1;
-        });
+        DOTween.Sequence()
+            .Append(transform.DOScale(defaultScale, 0.6f).SetEase(Ease.OutElastic))
+            .AppendCallback(()=> {
+                walkSpeedRatio = 1;
+            });
     }
+
+    // private void OnDrawGizmos() {
+    //     if (path == null) return;
+
+    //     Gizmos.color = Color.blue;
+    //     for (int i = currentWaypoint; i < path.vectorPath.Count - 1; i++) {
+    //         Gizmos.DrawLine(path.vectorPath[i], path.vectorPath[i + 1]);
+    //     }
+    // }
 
     public virtual void OnPathComplete(Path p)
     {
@@ -72,9 +83,12 @@ public class DinoAI : MonoBehaviour
         }
     }
 
-    public virtual void GeneratePath(Vector3 distination) {
+    public virtual void GeneratePath(Vector3 destination) {
+        if (path != null && Vector3.Distance(_creature.transform.position, destination) < nextWayPointDist)
+            return; // Avoid recalculating paths when close to destination
+
         if((seeker != null && Time.time - _pathFindingTime > generatePathInterval) && seeker.IsDone()) {
-            seeker.StartPath(_creature.transform.position, distination, OnPathComplete);
+            seeker.StartPath(_creature.transform.position, destination, OnPathComplete);
         }
     }
 
@@ -87,15 +101,16 @@ public class DinoAI : MonoBehaviour
             reachedEndOfPath = true;
             return;
         }
-        else {
-            reachedEndOfPath = false;
-        }
 
-        Vector3 dir = (path.vectorPath[currentWaypoint] - _creature.transform.position);
-        float wayPointDist = Vector3.Distance(_creature.transform.position, path.vectorPath[currentWaypoint]);
+        reachedEndOfPath = false;
+
+        Vector3 currentPos = _creature.transform.position;
+        Vector3 targetWaypoint = path.vectorPath[currentWaypoint];
+        Vector3 dir = targetWaypoint - currentPos;
+
         _creature.controls.Direction = (new Vector2(dir.x, dir.z)).normalized * walkSpeedRatio;
 
-        if(wayPointDist < nextWayPointDist) {
+        if(Vector3.Distance(currentPos, targetWaypoint) < nextWayPointDist) {
             currentWaypoint++;
         }
     }
