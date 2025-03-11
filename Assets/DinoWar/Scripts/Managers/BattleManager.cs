@@ -24,7 +24,7 @@ public class BattleManager : MonoBehaviour
     public Transform projectileContainer;
     public Transform creatureContainer;
     public Transform playerSpawnLocation;
-    public Transform enemySpawnLocation;
+    public Transform[] enemySpawnLocations;
 
     public ChasingCamera chasingCamera;
 
@@ -37,6 +37,7 @@ public class BattleManager : MonoBehaviour
     public Creature[] enemyRPrefabList;
     public Creature[] enemySPrefabList;
     public Creature[] enemySPPrefabList;
+
     public Dictionary<GameConstants.EnemeyType, Creature[]> enemyPrefabDict = new Dictionary<GameConstants.EnemeyType, Creature[]>();
 
     private PlayerMarker markerPrefab;
@@ -315,7 +316,7 @@ public class BattleManager : MonoBehaviour
         // TO-DO, spawning creature should pass to another manager which is managing battle ground. It is supposed to hold the spawning information
         Creature newEnemy = ObjectPoolManager.CreatePooled(prefab.gameObject, creatureContainer).GetComponent<Creature>();
         newEnemy.team = 1;
-        newEnemy.transform.position = enemySpawnLocation.transform.position + new Vector3(Random.value * 20, Random.value * 50, Random.value * 20);
+        newEnemy.transform.position =  enemySpawnLocations[Random.Range(0, enemySpawnLocations.Length)].transform.position + Random.insideUnitSphere * 20f;
     }
 
     public void RegisterActiveCreature(Creature c) {

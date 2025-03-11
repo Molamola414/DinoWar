@@ -6,7 +6,7 @@ using UnityEngine;
 public class BulletDetector : MonoBehaviour
 {
     public SphereCollider detectingCollider;
-    public List<BulletShell> bullets = new List<BulletShell>();
+    public readonly List<BulletShell> bullets = new List<BulletShell>();
     // Start is called before the first frame update
     public virtual void Awake()
     {

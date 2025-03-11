@@ -47,7 +47,7 @@ public class EnemyWaveData
         EnemyWaveData data = new EnemyWaveData();
         data.waveType = WaveType.WaveType_Normal;
         data.spawningPower = 18;
-        data.waveDuration = 30;
+        data.waveDuration = 300;
         data.genMeleeTypeRate = 20;
         data.meleeTypeCost = 1;
         data.genShortRangeTypeRate = 20;
@@ -66,7 +66,7 @@ public class EnemyWaveData
         EnemyWaveData data = new EnemyWaveData();
         data.waveType = WaveType.WaveType_Shooter;
         data.spawningPower = 18;
-        data.waveDuration = 30;
+        data.waveDuration = 300;
         data.genMeleeTypeRate = 0;
         data.genShortRangeTypeRate = 40;
         data.shortRangeTypeCost = 1;
@@ -82,7 +82,7 @@ public class EnemyWaveData
         EnemyWaveData data = new EnemyWaveData();
         data.waveType = WaveType.WaveType_Melee;
         data.spawningPower = 18;
-        data.waveDuration = 30;
+        data.waveDuration = 300;
         data.genMeleeTypeRate = 60;
         data.meleeTypeCost = 0.7f;
         data.genShortRangeTypeRate = 0;
@@ -99,7 +99,7 @@ public class EnemyWaveData
         EnemyWaveData data = new EnemyWaveData();
         data.waveType = WaveType.WaveType_Speedy;
         data.spawningPower = 9;
-        data.waveDuration = 12;
+        data.waveDuration = 120;
         data.genMeleeTypeRate = 33;
         data.meleeTypeCost = 1;
         data.genShortRangeTypeRate = 33;

@@ -10,7 +10,8 @@ public static class GameConstants
         ShortRanged,
         Ranged,
         Special,
-        Support
+        Support,
+        Boss
     }
 
     public static int LayerEnvironment = LayerMask.NameToLayer("Environment");
